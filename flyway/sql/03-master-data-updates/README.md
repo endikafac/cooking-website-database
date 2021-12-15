@@ -1,0 +1,1 @@
+Folder where all files containing data changes from the database must be included, they must follow this nomenclature VYYYYMMDD_HHMMSS__data_actionName_name.sql

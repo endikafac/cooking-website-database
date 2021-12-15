@@ -1,0 +1,1 @@
+Folder where all files containing a database structure change must be included, they must follow this nomenclature VYYYYMMDD_HHMMSS__structure_actionName_name.sql
