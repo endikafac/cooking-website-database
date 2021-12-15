@@ -211,7 +211,7 @@ DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'User identifier',
   `username` varchar(50) NOT NULL COMMENT 'User name in user table',
-  `password` varchar(10) NOT NULL COMMENT 'User password  in user table',
+  `password` varchar(100) NOT NULL COMMENT 'User password  in user table',
   `firstname` varchar(150) NOT NULL COMMENT 'Firstname in Author table',
   `lastname` varchar(300) NOT NULL COMMENT 'Lastname in Author table',
   `email` varchar(300) NOT NULL COMMENT 'Email in Author table',
@@ -221,6 +221,7 @@ CREATE TABLE `User` (
   `au_modification_user` int  COMMENT 'Audit field to store the modification user',
   `au_active` tinyint(1) DEFAULT '1' COMMENT 'Audit field to store whether the table record is active or not',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_unique_User_username` (`username`),
   KEY `idx_User_auActive` (`au_active`),
   KEY `idx_User_username` (`username`),
   KEY `idx_User_auCreationUser` (`au_creation_user`),
