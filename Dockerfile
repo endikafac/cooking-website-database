@@ -1,0 +1,38 @@
+##FROM mysql:8.0.26
+# Add a database
+##ENV MYSQL_DATABASE cookingwebsite
+# Add the content of the sql-scripts/ directory to your image
+# All scripts in docker-entrypoint-initdb.d/ are automatically
+# executed during container startup
+##COPY ./flyway/sql/01-core/ /docker-entrypoint-initdb.d/
+
+# docker build -t easaacr.azurecr.io/mysql:8.0.19.dev -f Dockerfile.dev .
+# docker run -p 3306:3306 --security-opt seccomp=unconfined -d --name mysql easaacr.azurecr.io/mysql:8.0.19.dev --sql-mode="ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION,NO_AUTO_VALUE_ON_ZERO"
+# Refer to this issue https://github.com/docker-library/mysql/issues/303 to get some insight on why --security-opt seccomp=unconfined
+
+FROM mysql:8.0.26
+
+ARG ARG_MYSQL_ROOT_PASSWORD=root
+ARG ARG_MYSQL_DATABASE=cookingwebsite
+ARG ARG_MYSQL_USER=user
+ARG ARG_MYSQL_PASSWORD=noroot
+ARG ARG_MYSQL_TIMEZONE=Europe/Madrid
+
+ENV MYSQL_ROOT_PASSWORD=$ARG_MYSQL_ROOT_PASSWORD \
+    MYSQL_DATABASE=$ARG_MYSQL_DATABASE \
+    MYSQL_USER=$ARG_MYSQL_USER \
+    MYSQL_PASSWORD=$ARG_MYSQL_PASSWORD \
+    TZ=$ARG_MYSQL_TIMEZONE
+
+########## CREATE DATABASE STRUCTURE ##########
+COPY ["flyway/globalConfigurationLocal", \
+      "flyway/sql/01-core", \
+      "flyway/sql/02-structure-updates", \
+      "flyway/sql/03-master-data-updates", \
+      "flyway/sqlTest", \
+      "/docker-entrypoint-initdb.d/"]
+      
+COPY conf.d/*.cnf /etc/mysql/conf.d/k
+
+EXPOSE 3306 3306
+CMD ["mysqld"]

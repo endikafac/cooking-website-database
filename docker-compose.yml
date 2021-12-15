@@ -1,0 +1,38 @@
+# Due the time of boot of cookingwebsite_mysql, do not run the docker-compose in one step
+# Run each service with it self command :
+# docker-compose -f docker-compose.yml up -d cookingwebsite_mysql
+# docker-compose -f docker-compose.yml up -d --build cookingwebsite_flyway_migrate
+
+version: '3.5'
+
+services:
+
+  cookingwebsite_mysql:
+    image: mysql:8.0.26
+    container_name: cookingwebsite_mysql
+    network_mode: host
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - "/data/mysql:/var/lib/mysql"
+      - "./conf.d/:/etc/mysql/conf.d/"
+    command: mysqld --sql_mode="ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION,NO_AUTO_VALUE_ON_ZERO"
+    environment:
+      MYSQL_DATABASE: 'cookingwebsite2'
+      MYSQL_USER: 'easa'
+      MYSQL_PASSWORD: 'noroot'
+      MYSQL_ROOT_PASSWORD: 'root'
+
+  cookingwebsite_flyway_migrate:
+    container_name: cookingwebsite_flyway_migrate
+    build: ./flyway/
+    network_mode: host
+    command: 'migrate'
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - "/data/mysql:/var/lib/mysql"
+    environment:
+      FLYWAY_URL: 'jdbc:mysql://localhost:3306/cookingwebsite2?serverTimezone=UTC'
+      FLYWAY_USER: 'root'
+      FLYWAY_PASSWORD: 'root'
