@@ -48,7 +48,7 @@ CREATE TABLE `Recipe` (
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeRecipe` BEFORE INSERT ON `Recipe` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, USER(),NEW.au_creation_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeRecipe` BEFORE INSERT ON `Recipe` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, 1,NEW.au_creation_user)); END */;;
 DELIMITER ;
 	/*!50003 SET character_set_client  = utf8mb4 */ ;
 	/*!50003 SET character_set_results = utf8mb4 */ ;
@@ -56,7 +56,7 @@ DELIMITER ;
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeRecipe` BEFORE UPDATE ON `Recipe` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, USER(),NEW.au_modification_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeRecipe` BEFORE UPDATE ON `Recipe` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, 1,NEW.au_modification_user)); END */;;
 DELIMITER ;
 	
 --
@@ -69,6 +69,53 @@ LOCK TABLES `Recipe` WRITE;
 UNLOCK TABLES;
 
 
+--
+-- Table structure for table `Comment`
+--
+
+DROP TABLE IF EXISTS `Comment`;
+ /*!40101 SET @saved_cs_client     = @@character_set_client  */;
+ /*!50503 SET character_set_client = utf8mb4  */;
+CREATE TABLE `Comment` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Keyword identifier',
+  `comment` varchar(500) NOT NULL COMMENT 'Comment  in Comment table',
+  `au_creation_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Audit field to store the creation date',
+  `au_creation_user` int DEFAULT NULL COMMENT 'Audit field to store the creation user',
+  `au_modification_date` datetime DEFAULT NULL COMMENT 'Audit field to store the modification date',
+  `au_modification_user` int DEFAULT NULL COMMENT 'Audit field to store the modification user',
+  `au_active` tinyint(1) DEFAULT '1' COMMENT 'Audit field to store whether the table record is active or not',
+  PRIMARY KEY (`id`),
+  KEY `idx_Comment_auActive` (`au_active`),
+  KEY `idx_Comment_comment` (`comment`),
+  KEY `idx_Comment_auCreationUser` (`au_creation_user`),
+  KEY `idx_Comment_auModificationUser` (`au_modification_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table that stores the recipes comments of the web application.';
+ 
+	/*!50003 SET character_set_client  = utf8mb4 */ ;
+	/*!50003 SET character_set_results = utf8mb4 */ ;
+	/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeComment` BEFORE INSERT ON `Comment` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, 1,NEW.au_creation_user)); END */;;
+DELIMITER ;
+	/*!50003 SET character_set_client  = utf8mb4 */ ;
+	/*!50003 SET character_set_results = utf8mb4 */ ;
+	/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeComment` BEFORE UPDATE ON `Comment` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, 1,NEW.au_modification_user)); END */;;
+DELIMITER ;
+	
+--
+-- Dumping data for table `Comment`
+--
+
+LOCK TABLES `Comment` WRITE;
+ /*!40000 ALTER TABLE  `Comment` DISABLE KEYS  */;
+ /*!40000 ALTER TABLE  `Comment` ENABLE KEYS  */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Keyword`
@@ -79,8 +126,7 @@ DROP TABLE IF EXISTS `Keyword`;
  /*!50503 SET character_set_client = utf8mb4  */;
 CREATE TABLE `Keyword` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'Keyword identifier',
-  `recipe_id` int NOT NULL COMMENT 'Recipe identifier, relationship with the Recipe table',
-  `keyword` varchar(100) NOT NULL COMMENT 'Keyword  in Keyword table',
+  `keyword` varchar(30) NOT NULL COMMENT 'Keyword  in Keyword table',
   `au_creation_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Audit field to store the creation date',
   `au_creation_user` int DEFAULT NULL COMMENT 'Audit field to store the creation user',
   `au_modification_date` datetime DEFAULT NULL COMMENT 'Audit field to store the modification date',
@@ -90,9 +136,7 @@ CREATE TABLE `Keyword` (
   KEY `idx_Keyword_auActive` (`au_active`),
   KEY `idx_Keyword_keyword` (`keyword`),
   KEY `idx_Keyword_auCreationUser` (`au_creation_user`),
-  KEY `idx_Keyword_auModificationUser` (`au_modification_user`),
-  KEY `idx_Keyword_recipeId` (`recipe_id`),
-  CONSTRAINT `fk_Keyword_Recipe` FOREIGN KEY (`recipe_id`) REFERENCES `Recipe` (`id`)
+  KEY `idx_Keyword_auModificationUser` (`au_modification_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table that stores the recipes keywords of the web application.';
  
 	/*!50003 SET character_set_client  = utf8mb4 */ ;
@@ -101,7 +145,7 @@ CREATE TABLE `Keyword` (
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeKeyword` BEFORE INSERT ON `Keyword` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, USER(),NEW.au_creation_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeKeyword` BEFORE INSERT ON `Keyword` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, 1,NEW.au_creation_user)); END */;;
 DELIMITER ;
 	/*!50003 SET character_set_client  = utf8mb4 */ ;
 	/*!50003 SET character_set_results = utf8mb4 */ ;
@@ -109,7 +153,7 @@ DELIMITER ;
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeKeyword` BEFORE UPDATE ON `Keyword` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, USER(),NEW.au_modification_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeKeyword` BEFORE UPDATE ON `Keyword` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, 1,NEW.au_modification_user)); END */;;
 DELIMITER ;
 	
 --
@@ -151,7 +195,7 @@ CREATE TABLE `Role` (
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeRole` BEFORE INSERT ON `Role` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, USER(),NEW.au_creation_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeRole` BEFORE INSERT ON `Role` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, 1,NEW.au_creation_user)); END */;;
 DELIMITER ;
 	/*!50003 SET character_set_client  = utf8mb4 */ ;
 	/*!50003 SET character_set_results = utf8mb4 */ ;
@@ -159,7 +203,7 @@ DELIMITER ;
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeRole` BEFORE UPDATE ON `Role` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, USER(),NEW.au_modification_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeRole` BEFORE UPDATE ON `Role` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, 1,NEW.au_modification_user)); END */;;
 DELIMITER ;
 	
 --
@@ -212,9 +256,10 @@ CREATE TABLE `User` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'User identifier',
   `username` varchar(50) NOT NULL COMMENT 'User name in user table',
   `password` varchar(100) NOT NULL COMMENT 'User password  in user table',
-  `firstname` varchar(150) NOT NULL COMMENT 'Firstname in Author table',
-  `lastname` varchar(300) NOT NULL COMMENT 'Lastname in Author table',
+  `firstname` varchar(150) COMMENT 'Firstname in Author table',
+  `lastname` varchar(300) COMMENT 'Lastname in Author table',
   `email` varchar(300) NOT NULL COMMENT 'Email in Author table',
+  `last_connection` datetime  COMMENT 'The date of the last connection in the user''s application',
   `au_creation_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Audit field to store the creation date',
   `au_creation_user` int COMMENT 'Audit field to store the creation user',
   `au_modification_date` datetime DEFAULT NULL COMMENT 'Audit field to store the modification date',
@@ -224,6 +269,7 @@ CREATE TABLE `User` (
   UNIQUE KEY `idx_unique_User_username` (`username`),
   KEY `idx_User_auActive` (`au_active`),
   KEY `idx_User_username` (`username`),
+  KEY `idx_User_lastConnection` (`last_connection`),
   KEY `idx_User_auCreationUser` (`au_creation_user`),
   KEY `idx_User_auModificationUser` (`au_modification_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table that stores the users of the web application';
@@ -234,7 +280,7 @@ CREATE TABLE `User` (
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeUser` BEFORE INSERT ON `User` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, USER(),NEW.au_creation_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgInsertBeforeUser` BEFORE INSERT ON `User` FOR EACH ROW BEGIN      SET NEW.au_creation_date = NOW(); SET NEW.au_creation_user =(SELECT IF (NEW.au_creation_user IS NULL, 1,NEW.au_creation_user)); END */;;
 DELIMITER ;
 	/*!50003 SET character_set_client  = utf8mb4 */ ;
 	/*!50003 SET character_set_results = utf8mb4 */ ;
@@ -242,7 +288,7 @@ DELIMITER ;
 	/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 	/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeUser` BEFORE UPDATE ON `User` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, USER(),NEW.au_modification_user)); END */;;
+	/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `tgUpdateBeforeUser` BEFORE UPDATE ON `User` FOR EACH ROW BEGIN      SET NEW.au_modification_date = NOW(); SET NEW.au_modification_user =(SELECT IF (NEW.au_modification_user IS NULL, 1,NEW.au_modification_user)); END */;;
 DELIMITER ;
 	
 --
@@ -253,3 +299,83 @@ LOCK TABLES `User` WRITE;
  /*!40000 ALTER TABLE  `User` DISABLE KEYS  */;
  /*!40000 ALTER TABLE  `User` ENABLE KEYS  */;
 UNLOCK TABLES;
+
+
+
+--
+-- Table structure for table `RecipeComment`
+--
+
+DROP TABLE IF EXISTS `RecipeComment`;
+ /*!40101 SET @saved_cs_client     = @@character_set_client  */;
+ /*!50503 SET character_set_client = utf8mb4  */;
+CREATE TABLE `RecipeComment` (
+  `recipe_id` int NOT NULL COMMENT 'Recipe identifier, relationship with the Recipe table',
+  `comment_id` int NOT NULL COMMENT 'Comment identifier, relationship with the Comment table',
+  PRIMARY KEY (`recipe_id`,`comment_id`),
+  KEY `idx_RecipeComment_recipeId` (`recipe_id`),
+  KEY `idx_RecipeComment_commentId` (`comment_id`),
+  CONSTRAINT `fk_RecipeComment_Recipe` FOREIGN KEY (`recipe_id`) REFERENCES `Recipe` (`id`),
+  CONSTRAINT `fk_RecipeComment_Comment` FOREIGN KEY (`comment_id`) REFERENCES `Comment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table that stores the comments of the recipes in the web application.';
+
+--
+-- Dumping data for table `RecipeComment`
+--
+
+LOCK TABLES `RecipeComment` WRITE;
+ /*!40000 ALTER TABLE  `RecipeComment` DISABLE KEYS  */;
+ /*!40000 ALTER TABLE  `RecipeComment` ENABLE KEYS  */;
+UNLOCK TABLES;
+
+
+--
+-- Table structure for table `RecipeKeyword`
+--
+
+DROP TABLE IF EXISTS `RecipeKeyword`;
+ /*!40101 SET @saved_cs_client     = @@character_set_client  */;
+ /*!50503 SET character_set_client = utf8mb4  */;
+CREATE TABLE `RecipeKeyword` (
+  `recipe_id` int NOT NULL COMMENT 'Recipe identifier, relationship with the Recipe table',
+  `keyword_id` int NOT NULL COMMENT 'Keyword identifier, relationship with the Keyword table',
+  PRIMARY KEY (`recipe_id`,`keyword_id`),
+  KEY `idx_RecipeKeyword_recipeId` (`recipe_id`),
+  KEY `idx_RecipeKeyword_keywordId` (`keyword_id`),
+  CONSTRAINT `fk_RecipeKeyword_Recipe` FOREIGN KEY (`recipe_id`) REFERENCES `Recipe` (`id`),
+  CONSTRAINT `fk_RecipeKeyword_Keyword` FOREIGN KEY (`keyword_id`) REFERENCES `Keyword` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table that stores the keywords of the recipes in the web application.';
+
+--
+-- Dumping data for table `RecipeKeyword`
+--
+
+LOCK TABLES `RecipeKeyword` WRITE;
+ /*!40000 ALTER TABLE  `RecipeKeyword` DISABLE KEYS  */;
+ /*!40000 ALTER TABLE  `RecipeKeyword` ENABLE KEYS  */;
+UNLOCK TABLES;
+
+
+
+
+CREATE OR REPLACE VIEW vw_User
+AS
+SELECT u.id , u.username,
+(SELECT COUNT(1)
+FROM Recipe r
+LEFT JOIN RecipeComment rc ON rc.recipe_id = r.id 
+LEFT JOIN Comment c ON c.id = rc.comment_id 
+WHERE r.user_id = u.id OR c.au_creation_user = u.id OR c.au_modification_user = u.id) as recipes_number
+FROM `User` u ;
+
+CREATE OR REPLACE VIEW vw_Comment
+AS
+SELECT c.id, rc.recipe_id, c.comment, IF(c.au_modification_date IS NULL,c.au_creation_date,c.au_modification_date) as last_date, c.au_creation_user AS `author_id`, CONCAT(u.firstname, ' ',u.lastname) AS `author`, u.username AS author_username
+FROM Comment c 
+INNER JOIN `User` u ON u.id = c.au_creation_user 
+INNER JOIN RecipeComment rc ON rc.comment_id = c.id 
+ORDER BY u.id ASC, last_date DESC;
+
+CREATE OR REPLACE VIEW vw_Keyword
+AS
+SELECT k.keyword, MAX(k.id) as id  FROM Keyword k GROUP BY keyword Order BY keyword ASC;
